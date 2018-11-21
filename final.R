@@ -49,3 +49,19 @@ data_r = data %>%
   data = left_join(data, data_r, by = "idhogar")
   ## remove unused columns
   ## data = data %>% select(-c(starts_with("parentesco")))
+
+
+  ## build score : wall / roof /floor
+data = data %>%
+  mutate(wall_score =
+           epared1 * 1 +
+           epared2 * 2 +
+           epared3 * 3,
+         roof_score = 
+           etecho1 * 1 +
+           etecho2 * 2 +
+           etecho3 * 3,
+         floor_score = 
+           eviv1 * 1 +
+           eviv2 * 2 + 
+           eviv3 * 3)

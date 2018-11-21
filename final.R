@@ -48,4 +48,4 @@ data_r = data %>%
   ## same as in SQL : LEFT JOIN t1 ON t1.id = t2.id
   data = left_join(data, data_r, by = "idhogar")
   ## remove unused columns
-  data = data %>% select(-c(starts_with("parentesco")))
+  ## data = data %>% select(-c(starts_with("parentesco")))

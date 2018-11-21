@@ -17,11 +17,35 @@ data = data.frame(data)
 ########## EDA ##########
 #########################
 
-
+## to be completed
 
 #########################
 ## DATA PREPARATION #####
 #########################
 
 ## recode data
-
+  ## parentesco1-12
+data_r = data %>%
+  mutate(parentfamily = 
+           parentesco1 +
+           parentesco2 + 
+           parentesco3 + 
+           parentesco6 + 
+           parentesco7 + 
+           parentesco9 + 
+           parentesco11,
+         parentinlaw = 
+           parentesco4 + 
+           parentesco5 + 
+           parentesco8 + 
+           parentesco10,
+         parentexte = 
+           parentesco12) %>%
+  group_by(idhogar) %>%
+  summarise(nb_parentfamily = sum(parentfamily),
+            nb_parentinlaw = sum(parentinlaw),
+            nb_parentexte = sum(parentexte))
+  ## same as in SQL : LEFT JOIN t1 ON t1.id = t2.id
+  data = left_join(data, data_r, by = "idhogar")
+  ## remove unused columns
+  data = data %>% select(-c(starts_with("parentesco")))

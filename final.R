@@ -160,8 +160,11 @@ data = data %>%
 # o 'pisonatur'= 1 qui signifie un sol avec des fibres naturelles
 # o 'techocane' = 1 signifie un toit pourri
 # o 'pareddes' = 1 signifie des murs de déchets
-# o	'abastaguano' =0 qui signifie qu'il n'y pas l'eau courante : +1
+# o	'abastaguano' =1 qui signifie qu'il n'y pas l'eau courante : +1
 # o	'cielorazo' = 0  qui signifie que la maison n'a pas de plafond : +1
+# o 'elimbasu3' = 1 qui signifie que les ordures sont brulées + 1
+# o 'energcocinar4' = 1 signifie que la cuisine est faite uniquement au charbon de bois + 1
+# o 'tipovivi4' = 1 signifie que la propriété est qualifiée de précaire (pas de propriété, terrain squatté par exemple)
 
 data  = data %>%
   mutate(malus = 
@@ -172,7 +175,10 @@ data  = data %>%
            techocane +
            pareddes +
            abastaguano +
-           cielorazo)
+           cielorazo +
+           elimbasu3 +
+           energcocinar4 +
+           tipovivi4)
 
 ## score bonus confort :
 # o	'refrig qui signifie que le foyer a une réfrégirateur : +1

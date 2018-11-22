@@ -162,3 +162,35 @@ data = data %>%
            computer + 
            v18q1 + 
            television)
+
+
+
+## recode age in 4 categories : 
+ data_r = data %>%
+   mutate(children =
+            ifelse(age < 8, 1, 0),
+          student = 
+            ifelse(age < 20, 1, 0), 
+          worker = 
+            ifelse(age < 65, 1 , 0), 
+          old = 
+            ifelse(age > 64, 1, 0)) %>%
+   group_by(idhogar) %>%
+   summarise( nb_children = sum(children),
+              nb_student = sum(student),
+              nb_worker = sum(worker),
+              nb_old = sum(old))
+ 
+data = left_join(data, data_r, by = "idhogar")
+
+
+## escolari recode : 
+data_r = data %>%
+  group_by(idhogar) %>%
+  summarise(sum_escolari = sum(escolari))
+
+data = left_join(data, data_r, by = "idhogar")
+
+data = data %>% 
+  mutate(moy_escolari = 
+           sum_escolari / (nb_student+nb_worker+nb_old))

@@ -105,3 +105,24 @@ data = data %>%
 
 data = data %>%
   mutate(score_elec = noelec*0 + coopele*1 + public*2 + planpri*3)
+
+## score malus  
+# o	'Sanitorio1' qui signifie qu'il n'y a pas de sanitaires dans la maison  : +1
+# o	'elec' = 0 qui signifie qu'il n'y pas d'électricité : +1
+# o	'pisonotiene' = 0 qui signifie qu'il n'y pas de sol dans la maison : +1
+# o 'pisonatur'= 1 qui signifie un sol avec des fibres naturelles
+# o 'techocane' = 1 signifie un toit pourri
+# o 'pareddes' = 1 signifie des murs de déchets
+# o	'abastaguano' =0 qui signifie qu'il n'y pas l'eau courante : +1
+# o	'cielorazo' = 0  qui signifie que la maison n'a pas de plafond : +1
+
+data  = data %>%
+  mutate(malus = 
+           sanitario1 +
+           noelec +
+           pisonotiene +
+           pisonatur +
+           techocane +
+           pareddes +
+           abastaguano +
+           cielorazo)

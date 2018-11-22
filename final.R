@@ -234,5 +234,21 @@ data_r = data %>%
   summarise(sum_dis = sum(dis, na.rm = T))
 
 data = left_join(data, data_r, by = "idhogar")
+
+## recode education_score into 4 categories : avg_score_educ, pct_adult_no_educ, pct_adult_top_educ
+data_r = data %>%
+  group_by(idhogar) %>%
+  summarise(sum_score_educ = sum(education_score, na.rm = T),
+            nb_adult_no_educ = sum(ifelse(education_score <= 3, worker,0)),
+            nb_adult_mid_educ = sum(ifelse(education_score >= 4 & education_score <= 7, worker, 0)),
+            nb_adult_higher_educ =  sum(ifelse(education_score >= 8, worker,0)))
+
+data = left_join(data, data_r, by = "idhogar")
+
+data = data %>%
+  mutate(avg_score_educ = sum_score_educ / hhsize,
+         pct_adult_no_educ = nb_adult_no_educ / hhsize,
+         pct_adult_mid_educ = nb_adult_mid_educ / hhsize,
+         pct_adult_higher_educ = nb_adult_higher_educ / hhsize)
   
  

@@ -258,3 +258,62 @@ data_r = data %>%
   summarise(official_union = max(ifelse(estadocivil3 == 1 | estadocivil4 == 1, 1, 0)))
 
 data = left_join(data, data_r, by = "idhogar")
+
+
+
+
+
+##########################
+## FEATURE SELECTION #####
+##########################
+
+# STEP 0 : SELECT CLEAN DATASET FOR TEST
+columns = c("Target", "rooms", "bedrooms", "overcrowding", "malus", "confort", "refrig",
+            "moy_escolari", "pct_adult_mid_educ","pct_adult_higher_educ","official_union",
+            "roof_score", "wall_score", "nb_children","nb_student","nb_worker", "nb_old",
+            "edjefa", "edjefe")
+
+data_test = data[parentesco1 == 1 , columns]
+data_test$Target = factor(data_test$Target)
+data_test = na.omit(data_test)
+
+# STEP 1: RANK THE VARIABLES BY IMPORTANCE
+library(randomForest)
+
+importance = function(S,dataset){
+  
+  set.seed(0)
+  
+  #START OF THE LOOP
+  for (loop in c(1:S) ){ 
+    
+    #Random draw with replacement
+    draw <- dataset[sample(1:nrow(dataset), nrow(dataset), replace=TRUE), ]
+    
+    #Importance of each covariate
+    rf <- randomForest(Target ~ ., data = draw)
+    imp <- rf$importance
+    
+    #Storing the importance for each draw
+    if(loop==1){
+      imp_all <- data.frame(imp)
+    }
+    else{
+      imp_all <- cbind(imp_all,data.frame(imp))
+    }
+    
+    #END OF THE LOOP
+  }
+  
+  #Calculate the average importance by variable and the rank
+  imp_average <- rowMeans(imp_all,na.rm=TRUE)
+  imp_rank <- order(imp_average,decreasing = TRUE)
+  
+  #RETURN THE RESULTS (the average importance, the rank based of the average importance, and importance by variable for each draw can be seen in output)
+  return(list(imp_average=imp_average,imp_rank=imp_rank,imp_all=imp_all))
+  
+}
+
+#Find the rank of the covariates according to the importance calculated from 50 random draws
+imp <- importance(50,data_test)
+imp$imp_average

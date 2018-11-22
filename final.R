@@ -23,6 +23,16 @@ data = data.frame(data)
 ## DATA PREPARATION #####
 #########################
 
+######### CLEANING #######
+
+## clean dependency 
+ data = data %>%
+   mutate(dependency = 
+            ifelse(dependency == "yes", 1,
+                   ifelse(dependency == "no", 0, as.numeric(as.character(dependency)))))
+
+######## RECODING ########
+
 ## recode data
   ## parentesco1-12
 data_r = data %>%

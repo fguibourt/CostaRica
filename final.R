@@ -186,15 +186,17 @@ data = data %>%
 
 
 ## recode age in 4 categories : 
- data_r = data %>%
+ data = data %>%
    mutate(children =
             ifelse(age < 8, 1, 0),
           student = 
-            ifelse(age < 20, 1, 0), 
+            ifelse(age >= 8 & age < 20, 1, 0), 
           worker = 
-            ifelse(age < 65, 1 , 0), 
+            ifelse(age >=20 & age < 65, 1 , 0), 
           old = 
-            ifelse(age > 64, 1, 0)) %>%
+            ifelse(age >= 64, 1, 0))
+
+data_r = data %>%
    group_by(idhogar) %>%
    summarise( nb_children = sum(children),
               nb_student = sum(student),

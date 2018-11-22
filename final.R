@@ -251,4 +251,10 @@ data = data %>%
          pct_adult_mid_educ = nb_adult_mid_educ / hhsize,
          pct_adult_higher_educ = nb_adult_higher_educ / hhsize)
   
- 
+
+ ## recode estadocivil in official_union = 1 if married or divorced, 0 else
+data_r = data %>%
+  group_by(idhogar) %>%
+  summarise(official_union = max(ifelse(estadocivil3 == 1 | estadocivil4 == 1, 1, 0)))
+
+data = left_join(data, data_r, by = "idhogar")

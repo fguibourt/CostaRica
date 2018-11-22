@@ -19,6 +19,14 @@ data = data.frame(data)
 
 ## to be completed
 
+#Plot des Target
+
+data %>%
+  ggplot(aes(Target))+
+  geom_bar(color = 'black', fill = 'lightblue')+
+  xlab("Target Classes")+ ylab("Target Classes Count")+
+  ggtitle("Target Repartition")
+
 #########################
 ## DATA PREPARATION #####
 #########################

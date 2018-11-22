@@ -100,3 +100,8 @@ data = data %>%
                             +techoentrepiso*2
                             +techocane*1
                             +techootro*4)
+
+## Score electricity ###
+
+data = data %>%
+  mutate(score_elec = noelec*0 + coopele*1 + public*2 + planpri*3)

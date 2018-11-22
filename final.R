@@ -25,6 +25,24 @@ data = data.frame(data)
 
 ######### CLEANING #######
 
+##Fill the NA
+
+#Fille the empty 'v18q1'
+data = mutate(data,v18q1 = ifelse(v18q==0,0,v18q1))
+
+#Fill the empty 'v2a1'
+data = mutate(data,v2a1 = ifelse(tipovivi1==1,0,v2a1))
+
+#Creating a 'v2a1_missing' column indicating there are v2a1 missing info
+data = mutate(data,v2a1_missing = ifelse(is.na(v2a1),"True","False"))
+
+#Fill the empty 'rez_esc'
+data = mutate(data,rez_esc = ifelse((age<7)|(age>19),0,rez_esc))
+
+#Creating a 'rez_esc_missing' column indicating there are rez_esc missing info
+data = mutate(data,rez_esc_missing = ifelse(is.na(rez_esc),"True","False"))
+
+
 ## clean dependency 
  data = data %>%
    mutate(dependency = 

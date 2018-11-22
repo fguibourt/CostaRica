@@ -126,3 +126,16 @@ data  = data %>%
            pareddes +
            abastaguano +
            cielorazo)
+
+## score bonus confort :
+# o	'refrig qui signifie que le foyer a une réfrégirateur : +1
+# o	'computer' qui signifie que le foyer a un ordinateur : +1
+# o	'v18q1' >0 qui signifie que le foyer a au moins une tablette : +1
+# o	'television' qui signifie que le foyer a une television : +1
+
+data = data %>% 
+  mutate(confort = 
+           refrig +
+           computer + 
+           v18q1 + 
+           television)

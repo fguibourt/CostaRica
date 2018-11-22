@@ -53,7 +53,9 @@ data = mutate(data,rez_esc_missing = ifelse(is.na(rez_esc),"True","False"))
             ifelse(dependency == "yes", 1,
                    ifelse(dependency == "no", 0, as.numeric(as.character(dependency)))))
 
-#clean edjefe/jefa + fusion
+######## RECODING ########
+
+## edjefe/jefa  fusion
 
 data = data %>%
   mutate(edjefe=
@@ -65,10 +67,16 @@ data = data %>%
            ifelse(edjefa=='yes',1,
                   ifelse(edjefa=='no',0,as.numeric(as.character(edjefa)))))
 
+edjefi = data$edjefa + data$edjefe
+
 data['edjefi'] = edjefi
 
 
-######## RECODING ########
+## Fusion des area
+
+data = data%>%
+  mutate(area_global=
+           ifelse(data$area1==1,1,2))
 
 ## recode data
   ## parentesco1-12

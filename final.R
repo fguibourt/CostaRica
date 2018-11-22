@@ -43,6 +43,8 @@ data = data %>%
            ifelse(edjefa=='yes',1,
                   ifelse(edjefa=='no',0,as.numeric(as.character(edjefa)))))
 
+data['edjefi'] = edjefi
+
 
 ######## RECODING ########
 

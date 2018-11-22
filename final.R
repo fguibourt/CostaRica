@@ -27,7 +27,7 @@ data = data.frame(data)
 
 # Suppression des colonnes tam_hog , hogar_total , et les Squares
 
-data_clean <- data[,c(1:18,10:99,101:133,143)]
+data_clean <- data[,c(1:18,20:99,101:133,143)]
 
 ##Fill the NA
 

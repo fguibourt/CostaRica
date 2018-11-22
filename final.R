@@ -277,6 +277,17 @@ data_r = data %>%
 
 data = left_join(data, data_r, by = "idhogar")
 
+## Création phone_per_capita
+data$phone_per_capita = data$qmobilephone/data$tamviv
+
+##Création tablet_per_capita
+data$tablet_per_capital = data$v18q1/data$tamviv
+
+##Création rooms_per_capita
+data$room_per_capital = data$rooms/data$tamviv
+
+##Création rent_per_capita
+data$rent_per_capital = data$v2a1/data$tamviv
 
 
 

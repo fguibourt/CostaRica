@@ -78,3 +78,25 @@ data = data %>%
            instlevel7 * 6 +
            instlevel8 * 7 +
            instlevel9 * 8)
+
+## Score_material ##
+
+data = data %>%
+  mutate(score_wall_material = paredblolad*6 
+                            + paredzocalo*4 
+                            + paredpreb*5 
+                            + pareddes*1 
+                            + paredmad*4 
+                            + paredzinc*4 
+                            + paredfibras*2 
+                            + paredother*2,
+         score_floor_material = pisomoscer*5
+                            + pisocemento*4
+                            + pisoother*4
+                            + pisonatur*1
+                            + pisonotiene*1
+                            + pisomadera*3,
+         score_roof_material = techozinc*2
+                            +techoentrepiso*2
+                            +techocane*1
+                            +techootro*4)

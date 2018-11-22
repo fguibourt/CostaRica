@@ -65,3 +65,16 @@ data = data %>%
            eviv1 * 1 +
            eviv2 * 2 + 
            eviv3 * 3)
+
+  ## instlevel recode 
+data = data %>%
+  mutate(education_score = 
+           instlevel1 * 0 +
+           instlevel2 * 1 +
+           instlevel3 * 2 +
+           instlevel4 * 3 +
+           instlevel5 * 4 +
+           instlevel6 * 5 +
+           instlevel7 * 6 +
+           instlevel8 * 7 +
+           instlevel9 * 8)

@@ -27,6 +27,12 @@ data %>%
   xlab("Target Classes")+ ylab("Target Classes Count")+
   ggtitle("Target Repartition")
 
+
+## graphique de Lugar en fonction des Target
+data_temp = select(data, starts_with("lugar"))
+vect_lugar = names(data_temp)[max.col(data_temp)]
+barplot(prop.table(table( data$Target,vect_lugar),2))
+
 #########################
 ## DATA PREPARATION #####
 #########################

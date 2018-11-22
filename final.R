@@ -31,6 +31,19 @@ data = data.frame(data)
             ifelse(dependency == "yes", 1,
                    ifelse(dependency == "no", 0, as.numeric(as.character(dependency)))))
 
+#clean edjefe/jefa + fusion
+
+data = data %>%
+  mutate(edjefe=
+           ifelse(edjefe=='yes',1,
+                  ifelse(edjefe=='no',0,as.numeric(as.character(edjefe)))))
+
+data = data %>%
+  mutate(edjefa=
+           ifelse(edjefa=='yes',1,
+                  ifelse(edjefa=='no',0,as.numeric(as.character(edjefa)))))
+
+
 ######## RECODING ########
 
 ## recode data

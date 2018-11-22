@@ -25,9 +25,13 @@ data = data.frame(data)
 
 ######### CLEANING #######
 
+# Suppression des colonnes tam_hog , hogar_total , et les Squares
+
+data_clean <- data[,c(1:18,10:99,101:133,143)]
+
 ##Fill the NA
 
-#Fille the empty 'v18q1'
+#Fill the empty 'v18q1'
 data = mutate(data,v18q1 = ifelse(v18q==0,0,v18q1))
 
 #Fill the empty 'v2a1'

@@ -196,3 +196,16 @@ data = left_join(data, data_r, by = "idhogar")
 data = data %>% 
   mutate(moy_escolari = 
            sum_escolari / (nb_student+nb_worker+nb_old))
+
+
+## recode rez_esc in pct_late
+data_r = data %>%
+  group_by(idhogar) %>%
+  summarise(sum_rez_esc = sum(rez_esc, na.rm = T))
+
+data = left_join(data, data_r, by = "idhogar")
+
+data = data %>%
+  mutate(pct_late = sum_rez_esc /(nb_student) )
+  
+ 

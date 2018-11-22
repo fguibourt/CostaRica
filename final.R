@@ -225,5 +225,12 @@ data = left_join(data, data_r, by = "idhogar")
 
 data = data %>%
   mutate(pct_late = sum_rez_esc /(nb_student) )
+
+## recode disable (individual) in nb_disable (foyer) 
+data_r = data %>%
+  group_by(idhogar) %>%
+  summarise(sum_dis = sum(dis, na.rm = T))
+
+data = left_join(data, data_r, by = "idhogar")
   
  

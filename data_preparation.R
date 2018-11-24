@@ -342,7 +342,7 @@ data_group = data_temp %>%
     official_union = 
       max(ifelse(estadocivil3 == 1 | estadocivil4 == 1, 1, 0)),
     age_IQR = 
-      IQR(age)
+      ifelse(IQR(age) == 0, median(age)/2, IQR(age))
   )
 
 ################### MERGE TEMP & GROUP ####################
@@ -369,6 +369,12 @@ data_temp = data_temp %>%
                          ifelse(lugar3 == 1, "Pacifico Central",
                                 ifelse(lugar4 == 1, "Brunca",
                                        ifelse(lugar5 == 1, "Huerta Atlantica","Huerta Norte"))))),
+         pct_male = 
+           r4h3 / hhsize,
+         house_score = 
+           floor_score + 
+           wall_score +
+           roof_score,
          Target = 
            factor(Target))
 
@@ -380,17 +386,68 @@ col_ft = c("Id","idhogar","Target","overcrowding", "edjefi", "hacdor", "rooms","
            "rooms_per_capital","rent_per_capital","nb_parentfamily","nb_parentinlaw","nb_parentexte","nb_children",
            "nb_student","nb_worker", "nb_old", "sum_dis","nb_adult_no_educ","nb_adult_mid_educ","nb_adult_higher_educ","official_union",
            "age_IQR","avg_score_educ","pct_adult_no_educ", "pct_adult_mid_educ", "pct_adult_higher_educ", "pct_late", "rez_esc_missing",
-            "lugar_region", "score_elec")
+            "lugar_region", "score_elec", "pct_male", "male", "house_score")
 data_ft = data_temp %>%
   filter(parentesco1 == 1) %>%
   select(col_ft) 
 names(data_ft)
 
 ## recode factors
-col_ft_factors = c("hacapo", "refrig", "v14a", "official_union", "hacdor","lugar_region")
+col_ft_factors = c("hacapo", "refrig", "v14a", "official_union", "hacdor","lugar_region","rez_esc_missing", "male")
 data_ft[col_ft_factors] = lapply(data_ft[col_ft_factors], as.factor)
 
 ## if you want to remove some columns : fill the -c() argument like -c(idhogar, Id, hacapo)
 data_ft = subset(data_ft, select = -c(idhogar, Id))
 
 data_ft = na.omit(data_ft)
+
+
+
+## FULL CORRPLOT
+data_corr3 = data_ft %>%
+  select_if(is.numeric)
+
+corr3 = cor(data_corr3, use = "complete.obs")
+corrplot(corr3, order = "hclust",tl.cex = 0.45)
+
+## CLEANING
+col_delete = c("nb_worker", "nb_old", "nb_children", "nb_parentfamily", "rooms_per_capital",
+               "nb_student", "nb_adult_no_educ", "nb_adult_mid_educ", "nb_adult_higher_educ", "r4h3", "r4m3", "qmobilephone",
+               "avg_score_educ","floor_score", "wall_score", "roof_score")
+data_ft = select(data_ft, -col_delete)
+
+## CLEAN CORRPLOT
+data_corr4 = data_ft %>%
+  select_if(is.numeric)
+
+corr4 = cor(data_corr4, use = "complete.obs")
+corrplot(corr4, order = "hclust", tl.cex = 0.5)
+
+## ACP
+data_acp3 = data_corr3 %>% 
+  mutate(Target = factor(data_ft$Target))
+
+data_acp4 = data_corr4 %>% 
+  mutate(Target = factor(data_ft$Target))
+
+
+## PCA avec les 40 variables numérique de base : on oublie
+acp3 = PCA(na.omit(data_acp3), quali.sup = 41, scale.unit = T, ncp = 3, graph = T)
+
+## PCA avec les variables numériques clean
+acp4 = PCA(na.omit(data_acp4), quali.sup = 25, scale.unit = T, ncp = 3, graph = F)
+acp4_var = get_pca_var(acp4)
+
+## choix du nombre d'axes : 3
+fviz_eig(acp4)
+
+## visualisation des nouveaux axes
+fviz_pca_var(acp4, col.var = "contrib", axes = c(1,2), select.var = list(contrib = 10))
+fviz_pca_var(acp4, col.var = "contrib", axes = c(1,3), select.var = list(contrib = 10))
+
+## contributions des variables aux nouveaux axes 
+corrplot(acp4_var$cos2)
+
+## visualisation des 4 individus représentatifs de chaque Target
+plot.PCA(acp4, choix="ind",invisible="ind", axes = c(1,2))
+plot.PCA(acp4, choix="ind",invisible="ind", axes = c(1,3))

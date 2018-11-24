@@ -148,30 +148,9 @@ fviz_pca_var(acp2, col.var = "contrib", select.var = list(contrib = 8))
 ########################### DATA PREPARATION #####
 ##################################################
 
-## load data
-data = as_data_frame(read.csv("train.csv/train.csv", sep = ",", header = T))
-data$Target = factor(data$Target)
-
-## clean data
-data = data %>%
-  mutate(dependency = 
-           ifelse(dependency == "yes", 1,
-                  ifelse(dependency == "no", 0, as.numeric(as.character(dependency)))),
-         v18q1 = 
-           ifelse(v18q == 0,0,v18q1),
-         v2a1 = 
-           ifelse(tipovivi1==1,0,v2a1),
-         v2a1_missing =
-           ifelse(is.na(v2a1),"True","False"),
-         rez_esc = 
-           ifelse((age<7)|(age>19),0,rez_esc),
-         rez_esc_missing = 
-           ifelse(is.na(rez_esc),"True","False"),
-         edjefi = 
-           ifelse(edjefe=='yes',1,
-                  ifelse(edjefe=='no',0,as.numeric(as.character(edjefe)))) 
-         + ifelse(edjefa=='yes',1,
-                  ifelse(edjefa=='no',0,as.numeric(as.character(edjefa)))))
+## convert factors back to numeric 
+data %<>%
+  mutate_each_(funs(as.numeric(.)),factors)
 
 ## data : original data
 ## data_temp : original data + features aggregated at the individual granularity
@@ -383,5 +362,7 @@ data_ft = data_temp %>%
            147:155,160:173,176,178:186)) 
 names(data_ft)
 
-## if you want to remove some columns from data_ft : 
+## if you want to remove some of the columns in data_ft
+## for instance SQBescolari, SQBage, SQBovercrowding : 
+
 data_ft = subset(data_ft, select = -c(SQBescolari, SQBage, SQBovercrowding))

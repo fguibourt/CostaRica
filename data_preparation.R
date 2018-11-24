@@ -4,12 +4,12 @@
 
 ## libraries
 library(dplyr)
-library(magrittr)
 library(corrplot)
 library(FactoMineR)
 library(factoextra)
 library(randomForest)
 library(ggplot2)
+library(GGally)
 
 ## set working directory
 setwd("C:/Users/Fratoi/Documents/Cours/Costa Rica")
@@ -51,8 +51,8 @@ factors = c('hacdor','hacapo','v14a','refrig','v18q','paredblolad','paredzocalo'
             'instlevel3','instlevel4','instlevel5','instlevel6','instlevel7','instlevel8','instlevel9','tipovivi1','tipovivi2','tipovivi3',
             'tipovivi4','tipovivi5','computer','television','mobilephone','lugar1','lugar2','lugar3','lugar4','lugar5','lugar6','area1','area2')
 
-data %<>%
-  mutate_each_(funs(factor(.)),factors)
+data[factors] = lapply(data[factors], as.factor)
+
 
 ##################################################
 ################################### EDA ##########
@@ -123,6 +123,7 @@ data_corr1 = data %>%
 corr1 = cor(data_corr1, use = "complete.obs")
 corrplot(corr1, order = "hclust")
 
+
 ## CLEAN CORRPLOT
 data_corr2 = data %>%
   select_if(is.numeric) %>%
@@ -132,16 +133,34 @@ corr2 = cor(data_corr2, use = "complete.obs")
 corrplot(corr2, order = "hclust")
 
 ## ACP
-# data_corr1$Target = data$Target
-# data_corr2$Target = data$Target
+data_acp1 = data_corr1 %>% 
+  mutate(Target = factor(data$Target))
 
-acp1 = PCA(data_corr1, scale.unit = T, ncp = 6, graph = T)
-acp2 = PCA(data_corr2, scale.unit = T, ncp = 6, graph = T)
+data_acp2 = data_corr2 %>% 
+  mutate(Target = factor(data$Target))
 
+
+## PCA avec les 37 variables numérique de base : on oublie
+acp1 = PCA(na.omit(data_acp1), quali.sup = 38, scale.unit = T, ncp = 3, graph = T)
+
+## PCA avec les variables numériques clean
+acp2 = PCA(na.omit(data_acp2), quali.sup = 14, scale.unit = T, ncp = 3, graph = F)
+acp2_var = get_pca_var(acp2)
+
+## choix du nombre d'axes : 3
 fviz_eig(acp2)
-fviz_pca_var(acp2, col.var = "contrib", select.var = list(contrib = 8))
 
-## to be completed
+## visualisation des nouveaux axes
+fviz_pca_var(acp2, col.var = "contrib", axes = c(1,2))
+fviz_pca_var(acp2, col.var = "contrib", axes = c(1,3))
+
+## contributions des variables aux nouveaux axes 
+corrplot(acp2_var$cos2)
+
+## visualisation des 4 individus représentatifs de chaque Target
+plot.PCA(acp2, choix="ind",invisible="ind", axes = c(1,2))
+plot.PCA(acp2, choix="ind",invisible="ind", axes = c(1,3))
+
 
 
 ##################################################
@@ -149,8 +168,8 @@ fviz_pca_var(acp2, col.var = "contrib", select.var = list(contrib = 8))
 ##################################################
 
 ## convert factors back to numeric 
-data %<>%
-  mutate_each_(funs(as.numeric(.)),factors)
+data[factors] = lapply(data[factors], as.character)
+data[factors] = lapply(data[factors], as.numeric)
 
 ## data : original data
 ## data_temp : original data + features aggregated at the individual granularity
@@ -355,14 +374,22 @@ data_temp = data_temp %>%
 
 ##################### DATA FT ################
 ## FINAL FEATURES ON HOUSEHOLDS ##
-
+col_ft = c("Id","idhogar","Target","rooms","hacapo","v14a","refrig","r4h3","r4m3","hhsize","dependency",
+           "meaneduc","bedrooms","qmobilephone","wall_score","roof_score","floor_score","score_wall_material",
+           "score_floor_material", "score_roof_material",  "score_elec","phone_per_capita","tablet_per_capital",
+           "rooms_per_capital","rent_per_capital","nb_parentfamily","nb_parentinlaw","nb_parentexte","nb_children",
+           "nb_student","sum_dis","nb_adult_no_educ","nb_adult_mid_educ","nb_adult_higher_educ","official_union",
+           "age_IQR","avg_score_educ","pct_adult_no_educ")
 data_ft = data_temp %>%
   filter(parentesco1 == 1) %>%
-  select(c(1,96,143,4:7, 12, 15, 23,101,104,114,124,134:141,
-           147:155,160:173,176,178:186)) 
+  select(col_ft) 
 names(data_ft)
 
-## if you want to remove some of the columns in data_ft
-## for instance SQBescolari, SQBage, SQBovercrowding : 
+## recode factors
+col_ft_factors = c("hacapo", "refrig", "v14a", "official_union")
+data_ft[col_ft_factors] = lapply(data_ft[col_ft_factors], as.factor)
 
-data_ft = subset(data_ft, select = -c(SQBescolari, SQBage, SQBovercrowding))
+## if you want to remove some columns : fill the -c() argument like -c(idhogar, Id, hacapo)
+data_ft = subset(data_ft, select = -c(idhogar, Id))
+
+

@@ -374,22 +374,23 @@ data_temp = data_temp %>%
 
 ##################### DATA FT ################
 ## FINAL FEATURES ON HOUSEHOLDS ##
-col_ft = c("Id","idhogar","Target","rooms","hacapo","v14a","refrig","r4h3","r4m3","hhsize","dependency",
+col_ft = c("Id","idhogar","Target","overcrowding", "edjefi", "hacdor", "rooms","hacapo","v14a","refrig","r4h3","r4m3","hhsize","dependency",
            "meaneduc","bedrooms","qmobilephone","wall_score","roof_score","floor_score","score_wall_material",
            "score_floor_material", "score_roof_material",  "score_elec","phone_per_capita","tablet_per_capital",
            "rooms_per_capital","rent_per_capital","nb_parentfamily","nb_parentinlaw","nb_parentexte","nb_children",
-           "nb_student","sum_dis","nb_adult_no_educ","nb_adult_mid_educ","nb_adult_higher_educ","official_union",
-           "age_IQR","avg_score_educ","pct_adult_no_educ")
+           "nb_student","nb_worker", "nb_old", "sum_dis","nb_adult_no_educ","nb_adult_mid_educ","nb_adult_higher_educ","official_union",
+           "age_IQR","avg_score_educ","pct_adult_no_educ", "pct_adult_mid_educ", "pct_adult_higher_educ", "pct_late", "rez_esc_missing",
+            "lugar_region", "score_elec")
 data_ft = data_temp %>%
   filter(parentesco1 == 1) %>%
   select(col_ft) 
 names(data_ft)
 
 ## recode factors
-col_ft_factors = c("hacapo", "refrig", "v14a", "official_union")
+col_ft_factors = c("hacapo", "refrig", "v14a", "official_union", "hacdor","lugar_region")
 data_ft[col_ft_factors] = lapply(data_ft[col_ft_factors], as.factor)
 
 ## if you want to remove some columns : fill the -c() argument like -c(idhogar, Id, hacapo)
 data_ft = subset(data_ft, select = -c(idhogar, Id))
 
-
+data_ft = na.omit(data_ft)

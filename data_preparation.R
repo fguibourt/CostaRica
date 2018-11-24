@@ -92,6 +92,19 @@ chisq.test(tt)
 
 #################### CLEANING ####################
 
+data_temp %>%
+  mutate(v18q1 = 
+           ifelse(v18q == 0,0,v18q1),
+         v2a1 = 
+           ifelse(tipovivi1==1,0,v2a1),
+         v2a1_missing =
+           ifelse(is.na(v2a1),"True","False"),
+         rez_esc = 
+           ifelse((age<7)|(age>19),0,rez_esc),
+         rez_esc_missing = 
+           ifelse(is.na(rez_esc),"True","False"))
+
+
 ## data : original data
 ## data_temp : original data + features aggregated at the individual granularity
 ## data_group : features aggregated at the household granularity

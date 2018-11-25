@@ -451,3 +451,13 @@ corrplot(acp4_var$cos2)
 ## visualisation des 4 individus représentatifs de chaque Target
 plot.PCA(acp4, choix="ind",invisible="ind", axes = c(1,2))
 plot.PCA(acp4, choix="ind",invisible="ind", axes = c(1,3))
+
+## after the Boruta feature selection
+col_selected = c("overcrowding", "edjefi","hacdor","rooms","refrig","hhsize",
+                 "dependency","meaneduc","bedrooms","score_wall_material",
+                 "score_floor_material","phone_per_capita","tablet_per_capital","rent_per_capital",
+                 "sum_dis","official_union","age_IQR","pct_adult_no_educ","pct_adult_mid_educ",
+                 "pct_adult_higher_educ","pct_late","lugar_region","pct_male","male",
+                 "house_score","Target")        
+
+data_ft = select(data_ft, col_selected)

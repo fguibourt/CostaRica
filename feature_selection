@@ -1,131 +1,26 @@
-##########################
-## FEATURE SELECTION #####
-##########################
+############################
+#### FEATURE SELECTION #####
+############################
+attach(data_ft)
 
+###### BORUTA ########
+library(Boruta)
 
+set.seed(123)
+boruta.train = Boruta(Target~., data = data_ft, doTrace = 2)
+print(boruta.train)
 
-# STEP 0 : SELECT CLEAN DATASET FOR TEST
-# remove the ids
-data_ft = subset(data_ft, select = -c(Id, idhogar))
-# check there is a columns with missing values
-colnames(data_ft)[colSums(is.na(data_ft)) > 0]
+## plot the results
+plot(boruta.train, xlab = "", xaxt = "n")
+lz<-lapply(1:ncol(boruta.train$ImpHistory),function(i)
+boruta.train$ImpHistory[is.finite(boruta.train$ImpHistory[,i]),i])
+names(lz) <- colnames(boruta.train$ImpHistory)
+Labels <- sort(sapply(lz,median))
+axis(side = 1,las=2,labels = names(Labels),
+       at = 1:ncol(boruta.train$ImpHistory), cex.axis = 0.7)
 
+ft_selected = c(getSelectedAttributes(boruta.train),"Target")
 
-columns = c("Target", "rooms", "bedrooms", "overcrowding", "malus", "confort", "refrig",
-            "moy_escolari", "pct_adult_mid_educ","pct_adult_higher_educ","official_union",
-            "roof_score", "wall_score", "nb_children","nb_student","nb_worker", "nb_old",
-            "edjefa", "edjefe")
+## Clean data_ft
 
-data_test = data_ft[,columns]
-data_test$Target = factor(data_test$Target)
-data_test = na.omit(data_test)
-
-# STEP 1: RANK THE VARIABLES BY IMPORTANCE
-
-importance = function(S,dataset){
-  
-  set.seed(0)
-  
-  #START OF THE LOOP
-  for (loop in c(1:S) ){ 
-    
-    #Random draw with replacement
-    draw <- dataset[sample(1:nrow(dataset), nrow(dataset), replace=TRUE), ]
-    
-    #Importance of each covariate
-    rf <- randomForest(Target ~ ., data = draw)
-    imp <- rf$importance
-    
-    #Storing the importance for each draw
-    if(loop==1){
-      imp_all <- data.frame(imp)
-    }
-    else{
-      imp_all <- cbind(imp_all,data.frame(imp))
-    }
-    
-    #END OF THE LOOP
-  }
-  
-  #Calculate the average importance by variable and the rank
-  imp_average <- rowMeans(imp_all,na.rm=TRUE)
-  imp_rank <- order(imp_average,decreasing = TRUE)
-  
-  #RETURN THE RESULTS (the average importance, the rank based of the average importance, and importance by variable for each draw can be seen in output)
-  return(list(imp_average=imp_average,imp_rank=imp_rank,imp_all=imp_all))
-  
-}
-
-#Find the rank of the covariates according to the importance calculated from 50 random draws
-imp <- importance(1,data_ft)
-imp$imp_average
-
-var_imp = data.frame(var = rownames(imp$imp_all), importance = imp$imp_all$MeanDecreaseGini)
-var_imp %>%
-  arrange(importance) %>%
-  ggplot(aes(x = reorder(var, importance), 
-             y = importance,
-             fill = importance)) +
-  geom_bar( stat = "identity") + 
-  coord_flip()
-
-
-
-#*******************************************************************************#
-#------ STEP 2 : SEQUENTIAL INTRODUCTION OF THE VARIABLE IN THE MODEL     ------#
-#*******************************************************************************#
-
-seqintro = function(K,dataset,rank){
-  
-  set.seed(0)
-  
-  #START OF THE LOOP
-  for (k in c(1:K)){ 
-    
-    #SPLIT THE DATA INTO A TEST AND A TRAINING SAMPLE
-    split1 <- sample(1:nrow(dataset),nrow(dataset)/3)
-    split2 <- (-split1)
-    test <- dataset[split1,]
-    train <- dataset[split2,]
-    
-    for (j in c(1:length(rank))){
-      
-      #RANDOM FOREST
-      sel <- c(rank[1:j],1) #variables selection
-      rf <- randomForest(Target ~ ., data = train[,sel])
-      ypred <- predict(rf,test,type="class")
-      miserror <- mean(test$Target != ypred)
-      print(table(test$Target, ypred))
-      print(miserror)
-      
-      #STORING THE MISCLASSIFICATION ERROR FOR EACH SEQUENCE
-      if(j==1){
-        miserror_seq <- data.frame(miserror)
-      }
-      else{
-        miserror_seq <- rbind(miserror_seq,data.frame(miserror))
-      }
-      
-      #END OF THE LOOP (SEQUENTIAL INTRODUCTION)
-    }
-    
-    #STORING THE MISCLASSIFICATION ERRORS BY SEQUENCE FOR EACH SAMPLE 
-    if(k==1){
-      miserror_all <- data.frame(miserror_seq)
-    }
-    else{
-      miserror_all <- cbind(miserror_all,data.frame(miserror_seq))
-    }  
-    
-    #END OF THE LOOP (RANDOM SAMPLES)
-  }
-  
-  #CALCULATE THE AVERAGE MISSCLASSIFICATION ERROR
-  miserror_average <- rowMeans(miserror_all,na.rm=TRUE)
-  
-  #OUTPUT
-  return(list(miserror_all=miserror_all,miserror_average=miserror_average,test=test,train=train))
-  
-}
-
-seq <- seqintro(1,data_ft,imp$imp_rank)
+data_ft = select(data_ft, ft_selected)

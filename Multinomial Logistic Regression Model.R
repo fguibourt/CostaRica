@@ -11,12 +11,7 @@ data_test = data_ft[-train_indices,]
 
 
 # Fit the model
-model <- nnet::multinom(Target ~
-                          +data_train$overcrowding+
-                          data_train$edjefi+
-                          data_train$phone_per_capita+
-                          data_train$meaneduc+
-                          data_train$age_IQR, data = data_train)
+model <- nnet::multinom(Target ~., data = data_train)
 summary(model)
 
 # Make predictions

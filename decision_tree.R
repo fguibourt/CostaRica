@@ -1,3 +1,18 @@
+library(dplyr)
+library(caret)
+
+## split test / train set
+train_indices = sample(nrow(data_ft), nrow(data_ft)*0.80)
+data_train = data_ft[train_indices,]
+data_test = data_ft[-train_indices,]
+
+## downsample / upsample
+data_train_down = downSample(data_train, data_train$Target) %>%
+  select(-c(Class))
+
+## upsample
+data_train_up = upSample(data_train, data_train$Target) %>%
+  select(-c(Class))
 ## F1 score function
 
 macroF1 = function(data, lev = NULL, model = NULL){
@@ -28,7 +43,7 @@ fitControl = trainControl(method = "cv",
 
 ## tree training
 rpartFit = train(as.factor(Target) ~.,
-                 data = data_ft,
+                 data = data_train_up,
                  method = "rpart",
                  trControl = fitControl,
                  tuneLength = 30,
@@ -38,5 +53,5 @@ rpartFit
 fancyRpartPlot(rpartFit$finalModel)
 varImp(rpartFit)
 
-predictions = predict(rpartFit, data_ft)
-confusionMatrix(predictions, data_ft$Target, mode = "everything")
+predictions = predict(rpartFit, data_test)
+confusionMatrix(predictions, data_test$Target, mode = "everything")

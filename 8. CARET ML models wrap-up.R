@@ -56,6 +56,77 @@ Target_Pred <- rfe(trainSet[,predictors], trainSet[,outcomeName],
 Target_Pred
 
 ## train some models
+## gbm
+fitControlGBM = trainControl(
+                  method = "cv",
+                  number = 5,
+                  summaryFunction = macroF1)
+
+model_gbm = train(trainSet[,predictors],
+                  trainSet[,outcomeName],
+                  method='gbm',
+                  metric = "F1",
+                  trControl = fitControlGBM,
+                  tuneLength = 10)
+
+
+predictors_reduced7 = c('edjefi', 'meaneduc', 'age_IQR', 'house_score','phone_per_capita',
+                        'dependency', 'overcrowding')
+
+model_gbm_reduced7 = train(trainSet[,predictors_reduced7],
+                  trainSet[,outcomeName],
+                  method='gbm',
+                  metric = "F1",
+                  trControl = fitControlGBM,
+                  tuneLength = 10)
+
+## gbm
+fitControlGBM = trainControl(
+  method = "cv",
+  number = 5,
+  summaryFunction = macroF1)
+
+model_gbm = train(trainSet[,predictors],
+                  trainSet[,outcomeName],
+                  method='gbm',
+                  metric = "F1",
+                  trControl = fitControlGBM,
+                  tuneLength = 10)
+
+predictors_reduced7 = c('edjefi', 'meaneduc', 'age_IQR', 'house_score','phone_per_capita',
+                        'dependency', 'overcrowding')
+
+model_gbm_reduced7 = train(trainSet[,predictors_reduced7],
+                           trainSet[,outcomeName],
+                           method='gbm',
+                           metric = "F1",
+                           trControl = fitControlGBM,
+                           tuneLength = 10)
+
+
+## xgboost
+fitControlXGB = trainControl(
+                method = "cv",
+                number = 5,
+                summaryFunction = macroF1)
+
+model_xgb = train(trainSet[,predictors],
+                  trainSet[,outcomeName],
+                  method='xgbTree',
+                  metric = "F1",
+                  trControl = fitControlGBM,
+                  tuneLength = 10)
+
+predictors_reduced7 = c('edjefi', 'meaneduc', 'age_IQR', 'house_score','phone_per_capita',
+                        'dependency', 'overcrowding')
+
+model_xgb_reduced7 = train(trainSet[,predictors_reduced7],
+                           trainSet[,outcomeName],
+                           method='xgbTree',
+                           metric = "F1",
+                           trControl = fitControlXGB,
+                           tuneLength = 3)
+
 
 ## rf
 fitControlRF = trainControl(
@@ -67,7 +138,7 @@ model_rf = train(trainSet[,predictors],
                  method='rf',
                  trControl = fitControlRF,
                  metric = "F1",
-                 tuneLength = 10)
+                 tuneLength = 5)
 
 
 ## neural networks
@@ -117,60 +188,19 @@ model_knn_reduced5 = train(trainSet[,predictors_reduced5],
 fitControlSVM = trainControl(
                 method = "cv",
                 number = 5,
-                summaryFunction = macroF1)
+                summaryFunction = macroF1,
+                verboseIter = T)
 
 model_svm = train(trainSet[,predictors],
                   trainSet[,outcomeName],
                   method = 'svmRadial', 
-                  trControl = fitControlKNN,
+                  trControl = fitControlSVM,
                   metric = "F1",
-                  tuneLength = 3)
-
-
-## gbm
-fitControlGBM = trainControl(
-                  method = "cv",
-                  number = 10,
-                  summaryFunction = macroF1)
-model_gbm = train(trainSet[,predictors],
-                  trainSet[,outcomeName],
-                  method='gbm',
-                  metric = "F1",
-                  trControl = fitControlGBM,
                   tuneLength = 10)
 
-predictors_reduced7 = c('edjefi', 'meaneduc', 'age_IQR', 'house_score','phone_per_capita',
-                        'dependency', 'overcrowding')
+## predictions and confusion matrix 
 
-model_gbm_reduced7 = train(trainSet[,predictors_reduced7],
-                  trainSet[,outcomeName],
-                  method='gbm',
-                  metric = "F1",
-                  trControl = fitControlGBM,
-                  tuneLength = 10)
-
-
-## xgboost
-fitControlXGB = trainControl(
-                method = "cv",
-                number = 10,
-                summaryFunction = macroF1)
-
-model_xgb = train(trainSet[,predictors],
-                  trainSet[,outcomeName],
-                  method='xgbTree',
-                  metric = "F1",
-                  trControl = fitControlGBM,
-                  tuneLength = 10)
-
-predictors_reduced7 = c('edjefi', 'meaneduc', 'age_IQR', 'house_score','phone_per_capita',
-                        'dependency', 'overcrowding')
-
-model_xgb_reduced7 = train(trainSet[,predictors_reduced7],
-                           trainSet[,outcomeName],
-                           method='xgbTree',
-                           metric = "F1",
-                           trControl = fitControlXGB,
-                           tuneLength = 3)
-
+predictionsGBM = predict.train(model_gbm, testSet[,predictors], type = "raw")
+cm = confusionMatrix(predictionsGBM, as.factor(testSet$Target), mode = "everything")
+mean(cm$byClass[,7])
 

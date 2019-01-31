@@ -1,10 +1,12 @@
 ############################
 #### FEATURE SELECTION #####
-############################
+
 attach(data_ft)
 
-###### BORUTA ########
+###### BORUTA #######
 library(Boruta)
+# merci boruta!
+library(ggplot2)
 
 set.seed(123)
 boruta.train = Boruta(Target~., data = data_ft, doTrace = 2)

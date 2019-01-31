@@ -11,6 +11,9 @@ library(randomForest)
 library(ggplot2)
 library(GGally)
 
+#ajout d'une ligne inutile pour tester Git
+library(arules)
+
 ## set working directory
 setwd("C:/Users/Fratoi/Documents/Cours/Costa Rica")
 
